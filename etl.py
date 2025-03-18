@@ -116,9 +116,7 @@ def load_df(df_songs, df_transform, database_filepath):
     print('Closed database successfully')
 
 
-if __name__ == '__main__':
-
-    write_to_db = True
+def spotify_etl():
 
     try:
         with open('data.json', 'r') as file:
@@ -141,14 +139,43 @@ if __name__ == '__main__':
     # Transform data
     df_transform= transform_df(df_songs)
 
-    # Print raw output
-    print(df_songs)
-    # Print arist count dataframe
-    print(df_transform)
+    return df_songs, df_transform
 
-    if write_to_db:
-        # Set database location
-        database_filepath = "sqlite:///my_played_tracks.sqlite"
-        load_df(df_songs, df_transform, database_filepath)
-    else:
-        print('No data uploaded')
+spotify_etl()
+
+# if __name__ == '__main__':
+
+#     write_to_db = True
+
+#     try:
+#         with open('data.json', 'r') as file:
+#             data = json.load(file)
+#             if len(data) == 0:
+#                 print('no data in json file')
+#                 sys.exit()
+#     except FileNotFoundError:
+#         print("Error: JSON file not found.")
+#     except json.JSONDecodeError:
+#         print("Error: Invalid JSON format in the file.")
+#     except Exception as e:
+#         print(f"An unexpected error occurred: {e}")
+
+#     # Extract initial data (initial API pull)
+#     df_songs = return_dataframe(data)
+
+#     # Run data quality check
+#     data_quality(df_songs)
+#     # Transform data
+#     df_transform= transform_df(df_songs)
+
+#     # Print raw output
+#     print(df_songs)
+#     # Print arist count dataframe
+#     print(df_transform)
+
+#     if write_to_db:
+#         # Set database location
+#         database_filepath = "sqlite:///my_played_tracks.sqlite"
+#         load_df(df_songs, df_transform, database_filepath)
+#     else:
+#         print('No data uploaded')
