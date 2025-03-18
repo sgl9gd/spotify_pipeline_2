@@ -1,0 +1,5 @@
+__pycache__/
+.venv/
+testing.py
+querying.py
+.env
