@@ -60,7 +60,7 @@ with dag:
 
     run_flask = PythonOperator(
         task_id='run_flask_app',
-        python_callable=start_flask_app,
+        python_callable=run_flask_app,
         dag=dag
     )
 
