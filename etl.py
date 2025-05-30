@@ -69,53 +69,6 @@ def transform_df(df):
 
     return df_transform[['ID','timestamp','artist_name','count']]
 
-def load_df(df_songs, df_transform, database_filepath):
-
-    # Loading into Database
-    engine = sqlalchemy.create_engine(database_filepath)
-    conn = sqlite3.connect('my_played_tracks.sqlite')
-    cursor = conn.cursor()
-
-    sql_query_1 = '''
-    CREATE TABLE IF NOT EXISTS tracks_streamed(
-        song_name VARCHAR(200),
-        artist_name VARCHAR(200),
-        played_at VARCHAR(200),
-        timestamp VARCHAR(200),
-        CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
-    )
-    '''
-
-    sql_query_2 ='''
-    CREATE TABLE IF NOT EXISTS artist_track_count(
-        timestamp VARCHAR(200),
-        ID VARCHAR(200),
-        artist_name VARCHAR(200),
-        count VARCHAR(200),
-        CONSTRAINT primary_key_constraint PRIMARY KEY (ID)
-        )
-    '''
-    cursor.execute(sql_query_1)
-    cursor.execute(sql_query_2)
-    print("Opened database successfully")
-
-    # Use a series of try/excepts to load data into the database
-    try:
-        df_songs.to_sql('tracks_streamed', engine, index=False, if_exists='append')
-        print('tracks_streamed updated')
-    except:
-        print('This data already exists in my_played_tracks')
-    try:
-        df_transform.to_sql('artist_track_count', engine, index=False, if_exists='append')
-        print('artist_track_count updated')
-    except:
-        print('This data already exists in artist_track_count')
-
-    # Close the database
-    conn.close()
-    print('Closed database successfully')
-
-
 def spotify_etl():
 
     try:
@@ -141,7 +94,104 @@ def spotify_etl():
 
     return df_songs, df_transform
 
-spotify_etl()
+# def load_df(df_songs, df_transform, database_filepath):
+
+#     # Loading into Database
+#     engine = sqlalchemy.create_engine(database_filepath)
+#     conn = sqlite3.connect('my_played_tracks.sqlite')
+#     cursor = conn.cursor()
+
+#     sql_query_1 = '''
+#     CREATE TABLE IF NOT EXISTS tracks_streamed(
+#         song_name VARCHAR(200),
+#         artist_name VARCHAR(200),
+#         played_at VARCHAR(200),
+#         timestamp VARCHAR(200),
+#         CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
+#     )
+#     '''
+
+#     sql_query_2 ='''
+#     CREATE TABLE IF NOT EXISTS artist_track_count(
+#         timestamp VARCHAR(200),
+#         ID VARCHAR(200),
+#         artist_name VARCHAR(200),
+#         count VARCHAR(200),
+#         CONSTRAINT primary_key_constraint PRIMARY KEY (ID)
+#         )
+#     '''
+#     cursor.execute(sql_query_1)
+#     cursor.execute(sql_query_2)
+#     print("Opened database successfully")
+
+#     # Use a series of try/excepts to load data into the database
+#     try:
+#         df_songs.to_sql('tracks_streamed', engine, index=False, if_exists='append')
+#         print('tracks_streamed updated')
+#     except:
+#         print('This data already exists in my_played_tracks')
+#     try:
+#         df_transform.to_sql('artist_track_count', engine, index=False, if_exists='append')
+#         print('artist_track_count updated')
+#     except:
+#         print('This data already exists in artist_track_count')
+
+#     # Close the database
+#     conn.close()
+#     print('Closed database successfully')
+
+
+# def load_df(df_songs, df_transform, database_filepath):
+#     engine = sqlalchemy.create_engine(database_filepath)
+
+#     with engine.connect() as connection:
+#         connection.execute('''
+#             CREATE TABLE IF NOT EXISTS tracks_streamed(
+#                 song_name VARCHAR(200),
+#                 artist_name VARCHAR(200),
+#                 played_at VARCHAR(200),
+#                 timestamp VARCHAR(200),
+#                 CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
+#             )
+#         ''')
+
+#         connection.execute('''
+#             CREATE TABLE IF NOT EXISTS artist_track_count(
+#                 timestamp VARCHAR(200),
+#                 ID VARCHAR(200),
+#                 artist_name VARCHAR(200),
+#                 count VARCHAR(200),
+#                 CONSTRAINT primary_key_constraint PRIMARY KEY (ID)
+#             )
+#         ''')
+
+#         # test = connection.execute(
+#         # '''
+#         # SELECT * FROM tracks_streamed
+#         # LIMIT 10
+#         # ''')
+#         # for row in test:
+#         #     print(row)
+
+#     print("Opened database successfully")
+
+#     try:
+#         df_songs.to_sql('tracks_streamed', engine, index=False, if_exists='append')
+#         print('tracks_streamed updated')
+#     except:
+#         print('This data already exists in my_played_tracks')
+
+#     try:
+#         df_transform.to_sql('artist_track_count', engine, index=False, if_exists='append')
+#         print('artist_track_count updated')
+#     except:
+#         print('This data already exists in artist_track_count')
+
+#     print('Closed database successfully')
+
+
+
+# spotify_etl()
 
 # if __name__ == '__main__':
 
