@@ -3,3 +3,8 @@ __pycache__/
 testing.py
 querying.py
 .env
+airflow/config
+airflow/logs
+airflow/plugins
+airflow/docker-compose.yaml
+airflow/.env
