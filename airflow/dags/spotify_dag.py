@@ -13,9 +13,9 @@ from sqlalchemy import create_engine
 from transforms.access import create_app
 from transforms.etl import spotify_etl
 
-def run_flask_app():
-    app = create_app()
-    app.run(host='0.0.0.0', debug=True, port=8888)
+# def run_flask_app():
+#     app = create_app()
+#     app.run(host='0.0.0.0', debug=False, use_reloader=False, port=8888)
 
 def run_etl_script():
     print('Start')
