@@ -5,7 +5,7 @@ from flask import Flask, redirect, jsonify, request, session, render_template
 import base64
 from datetime import datetime, timedelta
 import pandas as pd
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 # from transforms.etl import return_dataframe, transform_df
 import json
 import webbrowser
@@ -16,6 +16,7 @@ def create_app():
     app.secret_key = '9elrSMVWeIuOBCBPOLlnIoDF'
 
     load_dotenv()
+
 
     CLIENT_ID = os.getenv("CLIENT_ID")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
@@ -32,14 +33,14 @@ def create_app():
 
     @app.route('/')
     def login():
-        scope = ['user-read-recently-played']
+        scope = 'user-read-recently-played'
 
         header = {
             'client_id': CLIENT_ID,
             'response_type': 'code',
             'redirect_uri': REDIRECT_URI,
             'scope': scope,
-            #'show_dialog': True
+            'show_dialog': True
         } 
 
         auth_url = f'{AUTH_URL}?{urllib.parse.urlencode(header)}'
@@ -62,51 +63,41 @@ def create_app():
             client_creds_b64 = base64.b64encode(client_creds.encode())
 
             token_header = {
-                'Authorization':f'Basic {client_creds_b64.decode()}'
+                'Authorization':f'Basic {client_creds_b64.decode()}',
             }
             
             response = requests.post(TOKEN_URL, data=token_data,  headers=token_header)
             token_info = response.json()
 
+
+            # Store token for access later
             session['access_token'] = token_info['access_token']
-            #refresh_token = token_info['refresh_token']
             expires_in = token_info['expires_in'] # seconds
             token_type = token_info['token_type']
 
+            try:
+                refresh_token = token_info['refresh_token']
+                set_key('.env', 'REFRESH_TOKEN', refresh_token)
+                print("Refresh token saved:", refresh_token)
+            except KeyError:
+                print("Refresh token not found in token_info.")
+            except Exception as e:
+                print("Something went wrong:", str(e))
+
+            # # Get refresh token and write to .env file
+            # refresh_token = token_info['refresh_token']
+            # #set for refresh token write path
+            # env_path = '.env'
+            # set_key(env_path, 'REFRESH_TOKEN', refresh_token)
+            
             # Need to save the token info somewhere...
 
-            return redirect('/data_pull')
+            return redirect('/shutdown')
         
-    @app.route('/data_pull')
-    def data_pull():
-        
-        header = {
-            'Authorization': f'Bearer {session['access_token']}',
-            "Accept":"application/json",
-            "Content-Type":"application/json",
-        }
-
-        today = datetime.now()
-        yesterday = today - timedelta(days=1)
-        yesterday_unix = int(yesterday.timestamp())*1000
-
-        # Using API to pull after "yesterday" (or the last 24 hours)
-        response = requests.get(f"https://api.spotify.com/v1/me/player/recently-played?limit=50&after={yesterday_unix}", headers = header)
-
-        data_pull = response.json()
-
-        if os.path.exists(JSON_FILE_PATH):
-            with open(JSON_FILE_PATH, 'w') as file:
-                json.dump(data_pull, file, indent=4)
-                return redirect('/shutdown')
-        else:
-            return jsonify({"message": "data.json does not exist, no data written"})
-
-
     @app.route('/shutdown')
     def shutdown():
         os.kill(os.getpid(), signal.SIGINT)
-        return "Data written to data.json successfully. Server shutting down..."
+        return "Refresh token generated. Server shutting down..."
     
     return app
   

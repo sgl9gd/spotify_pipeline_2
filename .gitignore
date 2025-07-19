@@ -2,7 +2,7 @@ __pycache__/
 .venv/
 testing.py
 querying.py
-.env
+**/.env
 airflow/config
 airflow/logs
 airflow/plugins
