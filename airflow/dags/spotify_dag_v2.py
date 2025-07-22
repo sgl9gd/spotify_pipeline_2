@@ -54,7 +54,7 @@ def etl_task(**kwargs):
     engine = create_engine(f'postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/airflow')
 
     # Load into tables
-    df_songs.to_sql('my_tracks_played', engine, if_exists='append', index=False)
+    df_songs.to_sql('my_played_tracks', engine, if_exists='append', index=False)
     df_transform.to_sql('artist_track_count', engine, if_exists='append', index=False)
 
 def cleanup_temp_file(**kwargs):
