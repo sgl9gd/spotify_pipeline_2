@@ -64,11 +64,11 @@ def transform_df(df):
     df_transform = df_transform.rename(columns={'played_at':'count'})
 
     # Creating a Primary Key based on TimeStamp and Arist
-    df_transform['ID'] = df_transform['timestamp'].astype(str) + "-" + df_transform['artist_name']
+    df_transform['id'] = df_transform['timestamp'].astype(str) + "-" + df_transform['artist_name']
     # Strip special characters and white space
-    df_transform['ID'] = df_transform['ID'].str.replace('\\W','', regex=True)
+    df_transform['id'] = df_transform['id'].str.replace('\\W','', regex=True)
 
-    return df_transform[['ID','timestamp','artist_name','count']]
+    return df_transform[['id','timestamp','artist_name','count']]
 
 def etl(raw_data):
 

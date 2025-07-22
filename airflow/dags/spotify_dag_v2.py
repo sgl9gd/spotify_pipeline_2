@@ -38,7 +38,7 @@ def get_token_task(**kwargs):
 # Pull raw JSON data
 def data_pull_task(**kwargs):
     ti = kwargs['ti']
-    access_token = ti.xcom_pull(task_id='task_get_token', key='token')
+    access_token = ti.xcom_pull(task_ids='task_get_token', key='token')
     raw_data = get_data(access_token)
     with open('/tmp/recently_played.json','w') as f:
         json.dump(raw_data, f)
@@ -47,11 +47,11 @@ def data_pull_task(**kwargs):
 def etl_task(**kwargs):
     with open('/tmp/recently_played.json','r') as f:
         raw_data = json.load(f)
-    df_songs, df_transform = spotify_etl(raw_data)
+    df_songs, df_transform = etl(raw_data)
 
     # Create sqlalchemy engine
-    conn = BaseHook.get_connection('postgres_sql')
-    engine = create_engine(f'postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/{conn.schema}')
+    conn = BaseHook.get_connection('postgres_default')
+    engine = create_engine(f'postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/airflow')
 
     # Load into tables
     df_songs.to_sql('my_tracks_played', engine, if_exists='append', index=False)
@@ -103,8 +103,8 @@ with dag:
     conn_id = 'postgres_default',
     sql='''
         CREATE TABLE IF NOT EXISTS artist_track_count(
+        id VARCHAR(200),
         timestamp VARCHAR(200),
-        ID VARCHAR(200),
         artist_name VARCHAR(200),
         count VARCHAR(200)
     )
