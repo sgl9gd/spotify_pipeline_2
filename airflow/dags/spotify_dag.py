@@ -10,8 +10,8 @@ from sqlalchemy import create_engine
 
 # from airflow.utils.dates import days_ago
 
-from transforms.access import create_app
-from transforms.etl import spotify_etl
+# from transforms.access import create_app
+# from transforms.etl import spotify_etl
 
 # def run_flask_app():
 #     app = create_app()
@@ -73,3 +73,5 @@ with dag:
         python_callable=run_etl_script,
         dag=dag
     )
+
+
