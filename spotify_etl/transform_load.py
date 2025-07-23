@@ -1,7 +1,5 @@
 import pandas as pd
 from datetime import datetime, timedelta
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker
 import json
 import sqlite3
 import sys

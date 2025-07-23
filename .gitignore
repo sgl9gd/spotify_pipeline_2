@@ -6,5 +6,4 @@ querying.py
 airflow/config
 airflow/logs
 airflow/plugins
-airflow/docker-compose.yaml
 airflow/.env
