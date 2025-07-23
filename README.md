@@ -1,6 +1,6 @@
 # Introduction
 
-This project was inspired by sidarth1805: [link](https://github.com/sidharth1805/Spotify_etl.git). I started by trying to re-create the pipeline one-for-one but found it impossible since much of the API documentation has been updated. Below I'll walk through a bit of my thought process and how I ended up with the final product.
+This project was inspired by sidarth1805: [link](https://github.com/sidharth1805/Spotify_etl.git). I started by trying to re-create the pipeline one-for-one but found it impossible since much of the API documentation has been updated. It's also called spotify_pipline_2 because spotify_pipeline_1...has my CLIENT SECRET all over it. Well, either way, below I'll walk through a bit of my thought process and how I ended up with the final product.
 
 # Initial Attempt - Flask
 
