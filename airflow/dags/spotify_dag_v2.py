@@ -91,24 +91,23 @@ with dag:
             song_name VARCHAR(200),
             artist_name VARCHAR(200),
             played_at VARCHAR(200),
-            timestamp VARCHAR(200),
-            CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
+            timestamp VARCHAR(200)
         )
         '''
     )
 
     create_table2 = SQLExecuteQueryOperator(
-    task_id='create_table2',
-    # postgres_conn_id='postgre_sql',
-    conn_id = 'postgres_default',
-    sql='''
-        CREATE TABLE IF NOT EXISTS artist_track_count(
-        id VARCHAR(200),
-        timestamp VARCHAR(200),
-        artist_name VARCHAR(200),
-        count VARCHAR(200)
-    )
-    '''
+        task_id='create_table2',
+        # postgres_conn_id='postgre_sql',
+        conn_id = 'postgres_default',
+        sql='''
+            CREATE TABLE IF NOT EXISTS artist_track_count(
+            id VARCHAR(200),
+            timestamp VARCHAR(200),
+            artist_name VARCHAR(200),
+            count VARCHAR(200)
+        )
+        '''
     )
 
     get_token = PythonOperator(
@@ -126,9 +125,35 @@ with dag:
         python_callable=etl_task,
     )
 
+    delete_duplicates = SQLExecuteQueryOperator(
+        task_id='delete_dupes',
+        # postgres_conn_id='postgre_sql',
+        conn_id = 'postgres_default',
+
+        # These statements will de-dup the rows based on the columns that should be unique. The tables is then reindexed
+        sql='''
+            DELETE FROM my_played_tracks a
+            USING my_played_tracks b
+                WHERE
+                a.ctid > b.ctid
+                AND a.played_at = b.played_at;
+
+            REINDEX TABLE my_played_tracks;
+
+            DELETE FROM artist_track_count a
+            USING artist_track_count b
+                WHERE 
+                a.ctid > b.ctid
+                AND a.id = b.id;
+
+            REINDEX TABLE artist_track_count;
+        '''
+    )
+
+    # Task will remove the temp json file created to pass data from task to task
     clean_temp = PythonOperator(
         task_id='clean_temp_task',
         python_callable=cleanup_temp_file,
     )
 
-    get_token >> pull_data >> transform_load >> clean_temp
+    get_token >> pull_data >> transform_load >> delete_duplicates >> clean_temp
